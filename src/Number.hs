@@ -16,25 +16,20 @@ import Prelude  ( Int, Integer, Integral, Num, error, fromInteger, fromIntegral
 
 -- base --------------------------------
 
-import Data.Function  ( ($) )
-import Data.Int       ( Int8, Int16, Int32, Int64 )
-import Data.List      ( and )
-import Data.Maybe     ( Maybe( Just, Nothing ) )
-import Data.Typeable  ( Typeable, typeOf )
-import Data.Word      ( Word8, Word16, Word32, Word64 )
+import Data.Function    ( ($) )
+import Data.Int         ( Int8, Int16, Int32, Int64 )
+import Data.List        ( and )
+import Data.Maybe       ( Maybe( Just, Nothing ) )
+import Data.Monoid      ( (<>) )
+import Data.Typeable    ( Typeable, typeOf )
+import Data.Word        ( Word8, Word16, Word32, Word64 )
+import Numeric.Natural  ( Natural )
+import Text.Show        ( Show( show ) )
 
 -- base-unicode-symbols ----------------
 
 import Data.Function.Unicode  ( (∘) )
 import Data.Ord.Unicode       ( (≤), (≥) )
-
--- more-unicode ------------------------
-
-import Data.MoreUnicode.Natural  ( ℕ )
-
--- tfmt --------------------------------
-
-import Text.Fmt  ( fmt )
 
 --------------------------------------------------------------------------------
 
@@ -58,9 +53,9 @@ class ToNum α where
   toNumI  = toNum
   toNumi  ∷ α → Int
   toNumi  = toNum
-  toNumN  ∷ α → ℕ
+  toNumN  ∷ α → Natural
   toNumN  = toNum
-  toNumℕ  ∷ α → ℕ
+  toNumℕ  ∷ α → Natural
   toNumℕ  = toNum
   toNumW8  ∷ α → Word8
   toNumW8  = toNum
@@ -79,8 +74,8 @@ instance ToNum Int where
   toNum ∷ Num β ⇒ Int → β
   toNum = fromInteger ∘ toInteger
 
-instance ToNum ℕ where
-  toNum ∷ Num β ⇒ ℕ → β
+instance ToNum Natural where
+  toNum ∷ Num β ⇒ Natural → β
   toNum = fromInteger ∘ toInteger
 
 instance ToNum Word8 where
@@ -126,11 +121,12 @@ class Typeable α ⇒ FromI α where
   fromI' ∷ Integer → Maybe α
   fromI' = fromI
 
-  __fromI ∷ Integral β ⇒ β → α
+  __fromI ∷ (Show β, Integral β) ⇒ β → α
   __fromI i = let result = case fromI i of
                              Just x  → x
-                             Nothing → error $ [fmt|value %d out of %w range|]
-                                               i (typeOf result)
+                             Nothing → error $ "value " <> show i <> " out of "
+                                                        <> show (typeOf result)
+                                                        <> " range"
                in result
 
   __fromI' ∷ Integer → α
@@ -148,8 +144,8 @@ instance FromI Int where
             then Just (fromIntegral i)
             else Nothing
 
-instance FromI ℕ where
-  fromI ∷ Integral β ⇒ β → Maybe ℕ
+instance FromI Natural where
+  fromI ∷ Integral β ⇒ β → Maybe Natural
   fromI i = if i ≥ 0
             then Just (fromIntegral i)
             else Nothing
