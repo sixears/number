@@ -2,19 +2,21 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE QuasiQuotes          #-}
 {-# LANGUAGE TypeApplications     #-}
+{-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE UnicodeSyntax        #-}
 
 module Number
-  ( FromI( fromI, fromI', __fromI, __fromI' )
+  ( Absolutable( absT )
+  , FromI( fromI, fromI', __fromI, __fromI' )
   , NumSign(..), fromNumSign, toNumSign
   , ToNum( toNum, toNumI, toNumi, toNumN, toNumℕ
          , toNumW8, toNumW16, toNumW32, toNumW64 )
   )
 where
 
-import Prelude  ( Int, Integer, Integral, Num, error, fromInteger, fromIntegral
-                , maxBound, minBound, toInteger )
+import Prelude  ( Int, Integer, Integral, Num, abs, error, fromInteger
+                , fromIntegral, maxBound, minBound, toInteger )
 
 -- base --------------------------------
 
@@ -27,7 +29,7 @@ import Data.Maybe       ( Maybe( Just, Nothing ) )
 import Data.Monoid      ( (<>) )
 import Data.Ord         ( Ord, (>), (<) )
 import Data.Typeable    ( Typeable, typeOf )
-import Data.Word        ( Word8, Word16, Word32, Word64 )
+import Data.Word        ( Word, Word8, Word16, Word32, Word64 )
 import Numeric.Natural  ( Natural )
 import Text.Show        ( Show( show ) )
 
@@ -97,6 +99,10 @@ instance ToNum Int where
 
 instance ToNum Natural where
   toNum ∷ Num β ⇒ Natural → β
+  toNum = fromInteger ∘ toInteger
+
+instance ToNum Word where
+  toNum ∷ Num β ⇒ Word → β
   toNum = fromInteger ∘ toInteger
 
 instance ToNum Word8 where
@@ -171,6 +177,13 @@ instance FromI Natural where
             then Just (fromIntegral i)
             else Nothing
 
+instance FromI Word where
+  fromI ∷ Integral β ⇒ β → Maybe Word
+  fromI i = if and [ toInteger i ≤ toInteger (maxBound @Word)
+                   , toInteger i ≥ toInteger (minBound @Word) ]
+            then Just (fromIntegral i)
+            else Nothing
+
 instance FromI Word8 where
   fromI ∷ Integral β ⇒ β → Maybe Word8
   fromI i = if and [ toInteger i ≤ toInteger (maxBound @Word8)
@@ -226,5 +239,49 @@ instance FromI Int64 where
                    , toInteger i ≥ toInteger (minBound @Int64) ]
             then Just (fromIntegral i)
             else Nothing
+
+------------------------------------------------------------
+
+type family   UnsignedType signedType
+
+class Absolutable α where
+  absT ∷ α -> (NumSign,UnsignedType α)
+
+----------------------------------------
+
+{- | Simple implementation of `absT` for `FromI` instances. -}
+_absT ∷ (FromI β, Show α, Integral α) ⇒ α → (NumSign,β)
+_absT i = (toNumSign i, __fromI $ abs i)
+
+type instance UnsignedType Integer = Natural
+instance Absolutable Integer where
+  absT ∷ Integer → (NumSign,Natural)
+  absT = _absT
+
+type instance UnsignedType Int = Word
+instance Absolutable Int where
+  absT ∷ Int → (NumSign,Word)
+  absT = _absT
+
+type instance UnsignedType Int64 = Word64
+instance Absolutable Int64 where
+  absT ∷ Int64 → (NumSign,Word64)
+  absT = _absT
+
+type instance UnsignedType Int32 = Word32
+instance Absolutable Int32 where
+  absT ∷ Int32 → (NumSign,Word32)
+  absT = _absT
+
+type instance UnsignedType Int16 = Word16
+instance Absolutable Int16 where
+  absT ∷ Int16 → (NumSign,Word16)
+  absT = _absT
+
+type instance UnsignedType Int8 = Word8
+instance Absolutable Int8 where
+  absT ∷ Int8 → (NumSign,Word8)
+  absT = _absT
+
 
 -- that's all, folks! ----------------------------------------------------------
