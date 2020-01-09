@@ -7,8 +7,10 @@
 
 module Number
   ( FromI( fromI, fromI', __fromI, __fromI' )
+  , NumSign(..), fromNumSign, toNumSign
   , ToNum( toNum, toNumI, toNumi, toNumN, toNumℕ
-         , toNumW8, toNumW16, toNumW32, toNumW64 ) )
+         , toNumW8, toNumW16, toNumW32, toNumW64 )
+  )
 where
 
 import Prelude  ( Int, Integer, Integral, Num, error, fromInteger, fromIntegral
@@ -16,11 +18,14 @@ import Prelude  ( Int, Integer, Integral, Num, error, fromInteger, fromIntegral
 
 -- base --------------------------------
 
+import Data.Bool        ( otherwise )
+import Data.Eq          ( Eq )
 import Data.Function    ( ($) )
 import Data.Int         ( Int8, Int16, Int32, Int64 )
 import Data.List        ( and )
 import Data.Maybe       ( Maybe( Just, Nothing ) )
 import Data.Monoid      ( (<>) )
+import Data.Ord         ( Ord, (>), (<) )
 import Data.Typeable    ( Typeable, typeOf )
 import Data.Word        ( Word8, Word16, Word32, Word64 )
 import Numeric.Natural  ( Natural )
@@ -32,6 +37,22 @@ import Data.Function.Unicode  ( (∘) )
 import Data.Ord.Unicode       ( (≤), (≥) )
 
 --------------------------------------------------------------------------------
+
+{- | Much like `signum`, but using a dedicated, stronger type. -}
+data NumSign = MINUS | NOUGHT | PLUS
+  deriving (Eq,Show)
+
+toNumSign ∷ (Ord α, Num α) ⇒ α → NumSign
+toNumSign a | a < 0     = MINUS
+            | a > 0     = PLUS
+            | otherwise = NOUGHT
+
+fromNumSign ∷ Num α ⇒ NumSign → α
+fromNumSign MINUS  = -1
+fromNumSign PLUS   =  1
+fromNumSign NOUGHT =  0
+
+------------------------------------------------------------
 
 {- | Basically a superclass of Integral, but without the direct constraints on
      arithmetic operations (so you may, for example, not implement `(+)`.  So
