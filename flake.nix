@@ -6,7 +6,7 @@
     build-utils.url  = "github:sixears/flake-build-utils/r1.0.0.6";
   };
 
-  outputs = { self, nixpkgs, flake-utils, build-utils }:
+  outputs = { self, nixpkgs, build-utils }:
     build-utils.lib.hOutputs self nixpkgs "number" {
       ghc = p: p.ghc8107; # for tfmt
     };
