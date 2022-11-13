@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url     = "github:nixos/nixpkgs/be44bf67"; # nixos-22.05 2022-10-15
-    build-utils.url  = "github:sixears/flake-build-utils/r1.0.0.6";
+    build-utils.url  = "github:sixears/flake-build-utils/r1.0.0.10";
   };
 
   outputs = { self, nixpkgs, build-utils }:
