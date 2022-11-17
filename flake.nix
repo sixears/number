@@ -9,5 +9,18 @@
   outputs = { self, nixpkgs, build-utils }:
     build-utils.lib.hOutputs self nixpkgs "number" {
       ghc = p: p.ghc8107; # for tfmt
+      callPackage = { mkDerivation, lib, system
+                    , base, base-unicode-symbols }:
+        let
+          pkg = build-utils.lib.flake-def-pkg system;
+        in
+          mkDerivation {
+            pname = "number";
+            version = "1.1.2.10";
+            src = ./.;
+            libraryHaskellDepends = [ base base-unicode-symbols ];
+            description = "manage info.yaml";
+            license = lib.licenses.mit;
+          };
     };
 }

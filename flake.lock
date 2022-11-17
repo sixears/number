@@ -5,16 +5,16 @@
         "flake-utils": "flake-utils"
       },
       "locked": {
-        "lastModified": 1667475119,
-        "narHash": "sha256-mv1d9QkjdwPZ+JRC9AMKgah082AxKtEwKUC9FxlF2Q4=",
+        "lastModified": 1668705194,
+        "narHash": "sha256-ZSzwjWX0IuFelgjX7YWJB9x1nYv11RYrUkHvmG1+YXo=",
         "owner": "sixears",
         "repo": "flake-build-utils",
-        "rev": "86449a36851524aa56c26f1ac884cbf4bb1d0245",
+        "rev": "d65bec515df7b1153b98c06e3f91e5f50adcda81",
         "type": "github"
       },
       "original": {
         "owner": "sixears",
-        "ref": "r1.0.0.6",
+        "ref": "r1.0.0.11",
         "repo": "flake-build-utils",
         "type": "github"
       }

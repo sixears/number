@@ -1,3 +1,7 @@
+1.1.2.10 2022-11-17
+===================
+- use callPackage
+
 1.1.2.9 2022-11-17
 ==================
 - upgrade to callPackage-based versions
