@@ -16,7 +16,7 @@
         in
           mkDerivation {
             pname = "number";
-            version = "1.1.2.10";
+            version = "1.1.2.14";
             src = ./.;
             libraryHaskellDepends = [ base base-unicode-symbols ];
             description = "manage info.yaml";
